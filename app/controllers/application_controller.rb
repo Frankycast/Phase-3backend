@@ -29,26 +29,27 @@ class ApplicationController < Sinatra::Base
       user.to_json(include: :scores) 
      
     else
-       {error: "Incorrect username or password"}.to_json 
+       {error: "Incorrect username or password."}.to_json 
     end
+  end
+
+  post "/scores" do 
+    Score.all.to_json
   end
 
   post "/signup" do
 
+    user = User.new(params)
     #Find if there is a user with the params username
-    user = User.find_by(username: params[:username])
-
     #If there is not, then the new user can be added to the database
-    if user.nil?
-      user.create(username: params[:username], password: params[:password])
-      user.to_json
+    if user.username.blank? || user.password.blank? 
+      {error: "Invalid or password. Try again."}.to_json
     #If there is, throw an error message
     else
-      {error: "This user already exists. Try a new name"}.to_json
+      user.save()
+      user.to_json(include: :scores) 
     end
 
   end
-
-
 
 end
