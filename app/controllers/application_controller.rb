@@ -33,23 +33,29 @@ class ApplicationController < Sinatra::Base
     end
   end
 
-  post "/scores" do 
-    Score.all.to_json
+  post "/signup" do
+    new_user = User.new(params)
+    #Find if there is a user with the params username
+    #If there is, throw an error message
+    if User.find(username: new_user.username) || new_user.username.blank? || new_user.password.blank?
+      {error: "Invalid or password or username. Try again."}.to_json
+    #If there is not, then the new user can be added to the database
+    else
+      new_user.save()
+      new_user.to_json(include: :scores) 
+    end
   end
 
-  post "/signup" do
+  #Show scores table
+  post "/show" do
+    scores = Score.where(user_id: params[:user_id]).all
+  end
 
-    user = User.new(params)
-    #Find if there is a user with the params username
-    #If there is not, then the new user can be added to the database
-    if user.username.blank? || user.password.blank? 
-      {error: "Invalid or password. Try again."}.to_json
-    #If there is, throw an error message
-    else
-      user.save()
-      user.to_json(include: :scores) 
-    end
-
+  #Add a new score to the table
+  post "/new" do    
+    new_score = Score.create(score_val: params[:score_val], user_id: params[:user_id])
+    new_score.save()
+    new_score.to_json()
   end
 
 end
