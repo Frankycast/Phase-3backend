@@ -37,7 +37,7 @@ class ApplicationController < Sinatra::Base
     new_user = User.new(params)
     #Find if there is a user with the params username
     #If there is, throw an error message
-    if User.find(username: new_user.username) || new_user.username.blank? || new_user.password.blank?
+    if new_user.username.blank? || new_user.password.blank?
       {error: "Invalid or password or username. Try again."}.to_json
     #If there is not, then the new user can be added to the database
     else
